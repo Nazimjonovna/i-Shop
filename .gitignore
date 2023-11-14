@@ -1,0 +1,42 @@
+# Byte-compiled / optimized Python files
+*.pyc
+__pycache__/
+
+# Virtual environment
+venv/
+env/
+
+# Ignore Django's auto-generated files
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
+# Ignore local settings
+local_settings.py
+
+# Ignore secret key
+*.secret_key
+
+# Ignore IDE or editor-specific files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Ignore system and temporary files
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+
+# Ignore migration files if you're using Django < 1.7
+# Remove this block if using Django >= 1.7
+/migrations/
+/__pycache__/
