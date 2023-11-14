@@ -5,7 +5,7 @@ __pycache__/
 # Virtual environment
 venv/
 env/
-
+# end
 # Ignore Django's auto-generated files
 *.log
 *.pot
