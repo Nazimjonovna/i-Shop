@@ -71,6 +71,19 @@ class GetProView(APIView):
             return Response("Hozircha ma'lumot topilmadi")
 
 
+class CreditProductView(APIView): # Malades)
+
+    def get(self, request, pk):
+        product = Product.objects.filter(id = pk).first()
+        if product:
+            cost = (product.cost *(1+0.01*int(product.prosent)))/12
+            serializers = ProductSerializer(product)
+            return Response({
+                "cost_credit":str(cost),
+                "data":serializers.data
+            })
+        else:
+            return Response("Bunday mahsulot yoq")
 
 
 

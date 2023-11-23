@@ -1,4 +1,5 @@
 from django.db import models
+from Admin.models import Admin
 
 # Create your models here.
 class Product(models.Model):
@@ -17,19 +18,8 @@ class Product(models.Model):
     color = models.CharField(max_length=13, null=True)
     image = models.ImageField(upload_to = 'rasmlar/', null=True)
     time = models.DateTimeField(auto_now=True)
-    rat = (
-        ('1','1'),
-        ('2','2'),
-        ('3','3'),
-        ('4','4'),
-        ('5','5')
-    )
-    rate = models.CharField(max_length=10, choices=rat, default=1, null=True)
-    pro = (
-        ('is_buy', 'is_buy'),
-        ('is_like', 'is_like')
-    )
-    pro_x = models.CharField(max_length=50, choices=pro, null=True)
+    prosent = models.IntegerField(null=True, blank=True)
+    admin = models.ForeignKey(Admin, on_delete=models.CASCADE)
 
 
     def __str__(self):

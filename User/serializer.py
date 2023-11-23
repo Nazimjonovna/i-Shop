@@ -21,8 +21,8 @@ class OtpSRL(serializers.ModelSerializer):
 class RegisterSRL(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('name', 'surname', 'fulname', "phone", "password")
-        read_only_fields = ('password', 'phone')
+        fields = ('name', 'surname', 'fulname', "phone", "password", 'otp')
+        # read_only_fields = ('password', 'phone')
 
 
 class Log(serializers.ModelSerializer):
@@ -122,6 +122,25 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = "__all__"
+
+
+class OrderCashSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('card', 'card_number', 'address', 'viloyat')
+
+class OrderPaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('seria','raqam', 'pasport', 'image', 'address', 'viloyat', 'oy_cre', 'phone_cre')
+
+
+class NayutaCheckSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ('tasdiq',)
+
+
 
 
 

@@ -40,6 +40,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('User.urls')),
     path('pro/', include('Product.urls')),
+    path('adm/', include('Admin.urls')),
+    # path('notification/', include('Notification.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='i-Shop project'),
 ]
 # if settings.DEBUG:

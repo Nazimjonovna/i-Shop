@@ -79,6 +79,28 @@ class Order(models.Model):
     )
     payment = models.CharField(max_length=100, choices=pay, default='naqt')
     quantity = models.IntegerField(null=True)
+    rat = (
+        ('1', '1'),
+        ('2', '2'),
+        ('3', '3'),
+        ('4', '4'),
+        ('5', '5')
+    )
+    rate = models.CharField(max_length=10, choices=rat, default=1, null=True)
+    pro = (
+        ('is_buy', 'is_buy'),
+        ('is_like', 'is_like')
+    )
+    pro_x = models.CharField(max_length=50, choices=pro, null=True)
+    oy = (
+        ('6', '6'),
+        ('12', '12'),
+        ('24', '24')
+    )
+    oy_cre = models.CharField(max_length=50, choices=oy, default='6', null=True)
+    phone_regex = RegexValidator(regex='d{0,9}', message="Telefon raqamini +998XXXXXXXXX kabi kiriting!")
+    phone_cre = models.CharField(validators=[phone_regex], max_length=9, unique=True, null=True)
+    tasdiq = models.BooleanField(default=False, null=True)
 
     def __str__(self):
         return str(self.time)

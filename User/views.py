@@ -500,12 +500,94 @@ class PurchaseView(APIView):
 
     @swagger_auto_schema(request_body=OrderSerializer)
     def post(self, request):
-        serializer = OrderSerializer(data= request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+        pro_x = request.data.get('pro_x')
+
+        if pro_x == "is_buy":
+            serializer = OrderSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors)
         else:
-            return Response(serializer.errors)
+            date = d.datetime.today()
+            time = request.data.get('time')
+            print(time)
+
+            if time is None:
+                return Response("Time is missing. Please provide valid time.")
+
+            try:
+                time = d.datetime.strptime(time, '%Y-%m-%d %H:%M:%S')  # Assuming time format, adjust as needed
+            except ValueError:
+                return Response("Invalid time format. Please provide time in 'YYYY-MM-DD HH:MM:SS' format.")
+
+            if date < time:
+                serializers = OrderSerializer(data=request.data)
+                if serializers.is_valid():
+                    serializers.save()
+                    return Response(serializers.data)
+                else:
+                    return Response(serializers.errors)
+            else:
+                # Handle the case when date is not less than time
+                return Response('Korzinka avtomat tarzda tozalandi')
+
+    # def post(self, request):
+    #     pro_x = request.data.get('pro_x')
+    #     if pro_x == "is_buy":
+    #         serializer = OrderSerializer(data= request.data)
+    #         if serializer.is_valid():
+    #             serializer.save()
+    #             return Response(serializer.data)
+    #         else:
+    #             return Response(serializer.errors)
+    #     else:
+    #         date = d.datetime.today()
+    #         time = request.data.get('time')
+    #         print(time)
+    #         if date < time:
+    #             serializers = OrderSerializer(data=request.data)
+    #             if serializers.is_valid():
+    #                 serializers.save()
+    #                 return Response(serializers.data)
+    #             else:
+    #                 return Response(serializers.errors)
+    #         else:
+    #             request.data.delete()
+    #             return Response('Korzinka avtomat tarzda tozalandi')
+
+class OrderCashView(APIView):
+
+    def post(self, request, pk):
+        order = Order.objects.filter(id = pk).first()
+        if order.payment == 'naqt' or order.payment == 'card':
+            order.state = 'buyurtma_tayyorlanmoqda'
+            order.save()
+            serializer = OrderCashSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                return Response(serializers.errors)
+        else:
+            return Response('Hali order yo')
+
+class OrderPayView(APIView):
+
+    def post(self, request, pk):
+        order = Order.objects.filter(id = pk).first()
+        if order.payment == 'credit':
+            order.state = 'buyurtma_tayyorlanmoqda'
+            order.save()
+            serializer = OrderPaySerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                return Response(serializers.errors)
+        else:
+            return Response('Hali order yo')
 
 
 class Korzinka(APIView):
@@ -518,13 +600,15 @@ class Korzinka(APIView):
             order = Order.objects.filter(user = user.id).first()
             if order:
                 product = Product.objects.filter(name = order.product).first()
-                if product.pro_x == "is_buy":
+                print(product)
+                if order.pro_x == "is_buy":
                     serializer = OrderSerializer(order)
                     seri = ProductSerializer(product)
                     return Response({"data":serializer.data,
                                      "product":seri.data})
                 else:
                     date = d.datetime.today()
+                    print(order.time)
                     if order.time <= date:
                         serializer = PhoneSRL(product, many = True)
                         return Response(serializer.data)
@@ -538,28 +622,50 @@ class Korzinka(APIView):
             return Response("Siz hali ro'yhatdan o'tmagansiz")
 
 
+class NarxView(APIView):
+
+    def get(self, request, pk):
+        user = User.objects.filter(id = pk).first()
+        if user:
+            order = Order.objects.filter(user = user.id).all()
+            cost = 0
+            if order:
+                for i in order:
+                    j = Product.objects.filter(name = i.product).first()
+                    cost += j.cost
+                    # print(f"{i} ------- {j} ni {j.cost}")
+                # print(order, cost)
+                return Response({"status":"Malades", "cost":str(cost)})
+            else:
+                return Response("Sizda hali buyurtmalar yoq")
+        else:
+            return Response("Bunday user yoq")
 
 
 
+class CreditPayment(APIView):  # TETS
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def get(self,request, pk):
+        user = User.objects.filter(id = pk).first()
+        # print(user)
+        order = Order.objects.filter(user = user.id).all()
+        # print(order)
+        cost = 0
+        for i in order:
+            # print("i--", i)
+            if i.payment == "credit":
+                j = Product.objects.filter(name = i.product).first()
+                # print("j---", j)
+                if j:
+                    # print(j)
+                    # print("cost", j.cost)
+                    # print("protsent", j.prosent)
+                    # print("oy", i.oy_cre)
+                    cost = (j.cost * (1+j.prosent *0.01))/ int(i.oy_cre)
+                    # print(cost)
+                    pass # narxini o'zi bn dict qilib berish kk
+            pass
+        return Response("Malades")
 
 
 
