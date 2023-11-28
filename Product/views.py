@@ -92,3 +92,4 @@ class CreditProductView(APIView): # Malades)
 
 
 
+
