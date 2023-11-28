@@ -21,6 +21,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve
 admin.autodiscover()
 
 schema_view = get_schema_view(
@@ -43,6 +44,9 @@ urlpatterns = [
     path('adm/', include('Admin.urls')),
     # path('notification/', include('Notification.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='i-Shop project'),
-]
-# if settings.DEBUG:
-#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]+static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += [
+        path('media/<path:path>/', serve, {'document_root': settings.MEDIA_ROOT}),
+    ]
