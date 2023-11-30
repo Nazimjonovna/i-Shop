@@ -9,8 +9,8 @@ from django.db.models.signals import post_save
 @receiver(signal=post_save, sender=Order)
 def attach_notification_to_translator(sender, **kwargs):
     order = kwargs['instance']
-    if order.file_order is not None:
-        NotificationUser.objects.create(user=order.translator, client_order=order)
+    if order is not None:
+        NotificationUser.objects.create(user=order.user, product=order.product)
 
 
 class NotificationUser(models.Model):
@@ -31,8 +31,8 @@ class NotificationUser(models.Model):
 @receiver(signal=post_save, sender=Order)
 def attach_notification_to_translator(sender, **kwargs):
     order = kwargs['instance']
-    if order.file_order is not None:
-        NotificationAdmin.objects.create(user=order.translator, client_order=order)
+    if order is not None:
+        NotificationAdmin.objects.create(user=order.user, client_order=order)
 
 
 class NotificationAdmin(models.Model):

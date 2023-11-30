@@ -16,6 +16,7 @@ class UserCreateNotifications(generics.ListAPIView):
     def get(self, request):
         if request.order == True:
             user_notifs = request.user.user_n.filter(is_read=False)
+            print(user_notifs)
             serializer = self.serializer_class(user_notifs, many=True)
             return Response(serializer.data)
         else:
