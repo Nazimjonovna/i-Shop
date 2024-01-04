@@ -21,8 +21,7 @@ class OtpSRL(serializers.ModelSerializer):
 class RegisterSRL(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('name', 'surname', 'fulname', "phone", "password", 'otp')
-        # read_only_fields = ('password', 'phone')
+        fields = ('name', 'surname', "phone", "password", 'otp')
 
 
 class Log(serializers.ModelSerializer):

@@ -63,12 +63,20 @@ class GetProView(APIView):
     parser_classes = [MultiPartParser, ]
 
     def get(self,request):
-        product = Product.objects.all()
-        if product:
-            serializer = ProductSerializer(product, many = True)
-            return Response(serializer.data)
+        products = Product.objects.all()
+        response_data = {"products": []}
+
+        if products.exists():
+            for product in products:
+                sum_cre = (int(product.cost) * (1 + product.prosent)) / 12
+                serialized_product = ProductSerializer(product).data
+                serialized_product['credit_12ga'] = str(sum_cre)
+                response_data["products"].append(serialized_product)
+
+            return Response(response_data)
         else:
             return Response("Hozircha ma'lumot topilmadi")
+
 
 
 class CreditProductView(APIView): # Malades)

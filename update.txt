@@ -1,0 +1,80 @@
+update dagi o'rgarishla:
+1, tovarnarxi 3mln dan kam bo'lsa ish joy so'ramaydigan qil ungacha hamma fields lani o'zing tekshirasan
+
+
+
+
+chernavek:
+# class OrderCashView(APIView):
+#
+#     def post(self, request, pk):
+#         order = Order.objects.filter(id = pk).first()
+#         if order.payment == 'naqt' or order.payment == 'card':
+#             order.state = 'buyurtma_tayyorlanmoqda'
+#             order.save()
+#             serializer = OrderCashSerializer(data=request.data)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data)
+#             else:
+#                 return Response(serializers.errors)
+#         else:
+#             return Response('Hali order yo')
+#
+# class OrderPayView(APIView):
+#
+#     def post(self, request, pk):
+#         order = Order.objects.filter(id = pk).first()
+#         if order.payment == 'credit':
+#             order.state = 'buyurtma_tayyorlanmoqda'
+#             order.save()
+#             serializer = OrderPaySerializer(data=request.data)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data)
+#             else:
+#                 return Response(serializers.errors)
+#         else:
+#             return Response('Hali order yo')
+
+class PurchaseView(APIView):
+
+    permission_classes = [IsAuthenticated, ]
+    parser_classes = [parsers.MultiPartParser, ]
+
+    @swagger_auto_schema(request_body=OrderSerializer)
+    def post(self, request):
+        pro_x = request.data.get('pro_x')
+
+        if pro_x == "is_buy":
+            product = request.data.get('product')
+            x= Product.objects.filter(id = product).firts()
+            if request.data.get('quantity')<x.quantity:
+                serializer = OrderSerializer(data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data)
+                else:
+                    return Response(serializer.errors)
+            else:
+                return Response("Uzr bizda bu mahsulot hajmi chegaralangan")
+        else:
+            date = d.datetime.today()
+            time = request.data.get('time')
+            if time is None:
+                return Response("Vaqt?")
+
+            try:
+                time = d.datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                return Response("Vaqt formati: 'YYYY-MM-DD HH:MM:SS' .")
+
+            if date < time:
+                serializers = OrderSerializer(data=request.data)
+                if serializers.is_valid():
+                    serializers.save()
+                    return Response(serializers.data)
+                else:
+                    return Response(serializers.errors)
+            else:
+                return Response('Korzinka avtomat tarzda tozalandi')

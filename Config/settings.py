@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'User',
     'Product',
     'Admin',
-    'Notification',
+    # 'Notification',
 ]
 
 MIDDLEWARE = [
@@ -166,7 +166,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 MEDIA_URL = '/media/'
-#create media root
 MEDIA_ROOT = BASE_DIR / 'media'
 
 STATIC_URL = 'static/'

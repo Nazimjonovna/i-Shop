@@ -13,6 +13,7 @@ from Product.serializers import ProductSerializer
 # Create your views here.
 class LoginView(APIView):
 
+    @swagger_auto_schema(request_body=AdminLoginSerializer)
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
@@ -234,6 +235,7 @@ class GetOrderQuantityView(APIView):
 
 class PostReclamaView(APIView):
 
+    @swagger_auto_schema(request_body=ProductSerializer)
     def post(self, request):
         serializers = ProductSerializer(data=request.data)
         if serializers.is_valid():
@@ -278,6 +280,7 @@ class GetOneReclamaView(APIView):
 
 class EditReclamaView(APIView):
 
+    @swagger_auto_schema(request_body=ReclamaSerializer)
     def patch(self, request, pk):
         reclama = Reclama.objects.filter(id=pk).first()
         if reclama:
@@ -298,6 +301,31 @@ class DeleteReclamaView(APIView):
         reclama = Reclama.objects.filter(id = pk).first()
         reclama.delete()
         return Response("Malades o'chdi")
+
+
+class SuperAdminGetOrder(APIView):
+    def get(self, request, id):
+        admin = Admin.objects.filter(id = id).first()
+        if admin.is_boss:
+            orders = Order.objects.all()
+            tovarlar = []
+            for order in  orders:
+                if order.payment == 'naqt' or order.payment == 'card':
+                    tovarlar.append(order)
+                if order.payment == 'credit':
+                    if order.tasdiq:
+                        tovarlar.append(order)
+
+            if tovarlar:
+                serializers = OrderSerializer(tovarlar, many=True)
+                return Response(serializers.data)
+            else:
+                return Response('Hozircha aktiv buyurtmalar mavjud emas')
+        else:
+            return Response("Sizda bu ma'lumotlarni ko'rish huquqi mavjud emas")
+
+
+
 
 
 

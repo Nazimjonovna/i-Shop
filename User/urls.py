@@ -15,10 +15,13 @@ urlpatterns = [
     path('ch_phone/', ChangePhoneNumber.as_view()),
     path('ch_phone_verify/', ChangePhoneNumberVerifyCode.as_view()),
     path('ch_phone_conf/', ChangePhoneNumberConfirm.as_view()),
-    path('buy/', PurchaseView.as_view()),
-    path('cash/', OrderCashView.as_view()), #test qilish kk
-    path('cre/', OrderPayView.as_view()), #test qilish kk
-    path('korzinka/<int:pk>/', Korzinka.as_view()), # Korzinka
-    path('narx/<int:pk>/', NarxView.as_view()), # narxni hisoblash
-    path('cre_narx/<int:pk>/', CreditPayment.as_view()) # kredtini hisoblash narxini
+    # path('buy/', PurchaseView.as_view()),
+    # path('cash/', OrderCashView.as_view()), #test qilish kk
+    # path('cre/', OrderPayView.as_view()), #test qilish kk
+    path('korzinka/<int:pk>/', Korzinka.as_view()), # Korzinka istoriya productlaniki narxi bilan chiqarib beradi
+    path('is_like/<int:pk>/', IsLikeView.as_view()), # is likelani get qilish
+    # path('narx/<int:pk>/', NarxView.as_view()), # narxni hisoblash
+    # path('cre_narx/<int:pk>/', CreditPayment.as_view()) # kredtini hisoblash narxini
 ]
+
+

@@ -100,7 +100,7 @@ class Order(models.Model):
     oy_cre = models.CharField(max_length=50, choices=oy, default='6', null=True)
     phone_regex = RegexValidator(regex='d{0,9}', message="Telefon raqamini +998XXXXXXXXX kabi kiriting!")
     phone_cre = models.CharField(validators=[phone_regex], max_length=9, unique=True, null=True)
-    tasdiq = models.BooleanField(default=False, null=True)
+    tasdiq = models.BooleanField(null=True)
 
     def __str__(self):
         return str(self.time)
