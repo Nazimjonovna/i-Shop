@@ -17,7 +17,7 @@ class LoginView(APIView):
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
-        user = Admin.objects.filter(username=username, password=password).firts()
+        user = Admin.objects.filter(username=username, password=password).first()
         if user:
             serializer = AdminLoginSerializer(user, many = True)
             if serializer.is_valid():
