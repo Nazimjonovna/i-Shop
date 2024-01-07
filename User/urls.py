@@ -20,6 +20,8 @@ urlpatterns = [
     # path('cre/', OrderPayView.as_view()), #test qilish kk
     path('korzinka/<int:pk>/', Korzinka.as_view()), # Korzinka istoriya productlaniki narxi bilan chiqarib beradi
     path('is_like/<int:pk>/', IsLikeView.as_view()), # is likelani get qilish
+    path('post_order/<int:pk>/', StatausOrderView.as_view()), # narsa sotib olishi narxi payment uje bu
+    path("order/<int:id>/", UserOrderPostView.as_view()), # narsa sotib olishi order qo'shish
     # path('narx/<int:pk>/', NarxView.as_view()), # narxni hisoblash
     # path('cre_narx/<int:pk>/', CreditPayment.as_view()) # kredtini hisoblash narxini
 ]

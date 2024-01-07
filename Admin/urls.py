@@ -3,6 +3,7 @@ from .views import *
 
 urlpatterns = [
     path('admin_login/', LoginView.as_view()), # admin login
+    path('addadmin/<int:pk>/', AddAdminView.as_view()), # add admin
     path('Begzod/', BossView.as_view()), # faqat Begzod aka uchun
     path('count/', ProductView.as_view()), # jami procustlar soni
     path('chek/<int:pk>/', AdminChekView.as_view()), # adminla qancha product qo'shganini ko'rish

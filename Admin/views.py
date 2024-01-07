@@ -6,8 +6,8 @@ from .models import *
 from .serializer import *
 from User.models import Order
 from User.serializer import OrderSerializer, NayutaCheckSerializer
-from Product.models import Product
-from Product.serializers import ProductSerializer
+from Product.models import *
+from Product.serializers import *
 
 
 # Create your views here.
@@ -27,6 +27,21 @@ class LoginView(APIView):
                 return Response(serializer.errors)
         else:
             return Response("Bunday admin yoq")
+
+
+class AddAdminView(APIView):
+
+    def post(self, request, pk):
+        admin  = Admin.objects.filter(id =pk).first()
+        if admin.is_boss:
+            serializers = AdminLoginSerializer(data = request.data)
+            if serializers.is_valid():
+                serializers.save()
+                return Response(serializers.data)   
+            else:
+                return Response(serializers.errors)
+        else:
+            return Response("Sizga mumkin emas")
 
 
 class BossView(APIView): # ERROR
@@ -51,11 +66,19 @@ class AdminChekView(APIView):
     def get(self, request, pk):
         admin = Admin.objects.filter(id=pk).first()
         if admin:
-            product = Product.objects.filter(admin = pk).all()
-            serializer = ProductSerializer(product, many=True)
+            products = Product.objects.filter(admin = pk).all()
+            pros =[]
+            pr =[]
+            for product in products:
+                if product.tasdiq:
+                    pr.append(ProductInfo.objects.filter(product=product.id))
+                    pros.append(product)
+            serializer = ProductSerializer(pros, many=True)
+            seri = ProducInfoSerializer(pr, many=True)
             if product:
                 return Response({"Admin":admin.username,
-                                 "data":serializer.data})
+                                 "data":serializer.data,
+                                 'mana':seri.data})
             else:
                 return Response("Ushbu admin hali project qo'shmadi")
         else:
@@ -224,8 +247,9 @@ class GetOneOrderEditView(APIView):
 class GetOrderQuantityView(APIView):
 
     def get(self, request, name):
-        product = Product.objects.filter(name = name).first()
-        if product:
+        produc = ProductInfo.objects.filter(name = name).first()
+        if produc:
+            product = Product.objects.filter(id = produc).first()
             quantity = product.quantity
             serializer = ProductSerializer(product, many = True)
             return Response({
@@ -325,7 +349,19 @@ class SuperAdminGetOrder(APIView):
             return Response("Sizda bu ma'lumotlarni ko'rish huquqi mavjud emas")
 
 
+class SuperPostProduct(APIView):
 
+    def patch(self, request, pk):
+        product = Product.objects.get(pk=pk)
+        if product:
+            serializers = ProductSerializer(data=request.data, instance=product, partial=True)
+            if serializers.is_valid():
+                serializers.save()
+                return Response(serializers.data)
+            else:
+                return Response(serializers.errors)
+        else:
+            return Response("Bunday mahsulot yo")
 
 
 

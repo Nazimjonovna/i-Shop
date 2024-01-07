@@ -13,7 +13,8 @@ from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, parsers
-from Product.serializers import ProductSerializer
+from Product.serializers import *
+from Product.models import *
 from .serializer import *
 from .models import *
 
@@ -497,6 +498,27 @@ class ChangePhoneNumberConfirm(APIView):
 
 
 
+class UserOrderPostView(APIView):
+    parser_classes = [parsers.MultiPartParser, ]
+
+    @swagger_auto_schema(request_body=OrderSerializer)
+    def post(self, request, id):
+        product = Product.objects.filter(id=id).first()
+        quantity = int(request.data['quantity'])
+        if product.quantity > 0 and product.quantity >= quantity:
+            serializers = OrderSerializer(data=request.data)
+            if serializers.is_valid():
+                serializers.save()
+                return Response(serializers.data)
+            else:
+                return Response(serializers.errors)
+        else:
+            return Response("Bizda bu mahsulot hozircha yetarli emas")
+
+            
+
+
+
 
 
 class Korzinka(APIView):
@@ -512,31 +534,35 @@ class Korzinka(APIView):
             qomagan = []
             for order in orders:
                 if order.payment == "naqt":
-                    product = order.product
-                    product_instance = Product.objects.filter(name=product).first()
+                    prod = order.product
+                    product = Product.objects.filter(id=prod.id).first()
+                    name = ProductInfo.objects.get(product=prod.id).name
+                    product_instance = ProductInfo.objects.get(product=prod.id)
                     if product_instance:
                         if order.pro_x == "is_buy":
-                            if order.quantity <= product_instance.quantity:
-                                sum_all += int(product_instance.cost) * int(order.quantity)
+                            if order.quantity <= product.quantity:
+                                sum_all += int(product.cost) * int(order.quantity)
                                 serializer = OrderSerializer(order)
-                                seri = ProductSerializer(product_instance)
+                                seri = ProducInfoSerializer(product_instance)
                             else:
-                                qma = ProductSerializer(product_instance)
-                    qomagan.append(qma)
+                                qma = ProducInfoSerializer(product_instance)
+                                qomagan.append(qma)
                     products.append(seri.data)
                 else:
-                    product = order.product
-                    product_instance = Product.objects.filter(name=product).first()
+                    prod = order.product
+                    product = Product.objects.filter(id=prod.id).first()
+                    name = ProductInfo.objects.get(product=prod.id).name
+                    product_instance = name
                     if product_instance:
                         if order.pro_x == "is_buy":
-                            if order.quantity <= product_instance.quantity:
-                                sum_cre += (int(product_instance.cost)*(1 + int(product_instance.prosent)) * int(order.quantity))/int(order.oy_cre)
+                            if order.quantity <= product.quantity:
+                                sum_cre += (int(product.cost)*(1 + int(product.prosent)) * int(order.quantity))/int(order.oy_cre)
                                 serializer = OrderSerializer(order)
-                                seri = ProductSerializer(product_instance)
+                                seri = ProducInfoSerializer(product_instance)
                             else:
-                                qma = ProductSerializer(product_instance)
+                                qma = ProducInfoSerializer(product_instance)
+                                qomagan.append(qma)
                     products.append(seri.data)
-                    qomagan.append(qma)
             return Response({
                             "sum_all":str(sum_all),
                             "sum_cre":str(sum_cre),
@@ -548,8 +574,8 @@ class Korzinka(APIView):
         else:
             return Response("Siz hali ro'yhatdan o'tmagansiz")
 
-class StatausOrderView(APIView): # rasmiylashtirish orderni shunda orderni ustiga bosadi
-
+class StatausOrderView(APIView): # rasmiylashtirish orderni shunda orderni ustiga bosadi tipa order post
+    @swagger_auto_schema(request_body=OrderSerializer)
     def patch(self, request, pk):
         order = Order.objects.filter(id = pk).first()
         if order:
@@ -605,7 +631,8 @@ class IsLikeView(APIView):
         if user:
             order = Order.objects.filter(user=user.id).first()
             if order:
-                product = Product.objects.filter(name=order.product).first()
+                product = Product.objects.filter(id=order.product.id).first()
+                pro_info = ProductInfo.objects.filter(product=product).first()
                 if order.pro_x == "is_like":
                     date = d.datetime.today()
                     time = request.data.get('time')
@@ -619,7 +646,7 @@ class IsLikeView(APIView):
 
                     if date < time:
                         serializer = OrderSerializer(order)
-                        seri = ProductSerializer(product)
+                        seri = ProducInfoSerializer(pro_info)
                         return Response({"data": serializer.data,
                                          "product": seri.data})
                     else:
