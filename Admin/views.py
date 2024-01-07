@@ -20,11 +20,7 @@ class LoginView(APIView):
         user = Admin.objects.filter(username=username, password=password).first()
         if user:
             serializer = AdminLoginSerializer(user, many = True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            else:
-                return Response(serializer.errors)
+            return Response(serializer.data)
         else:
             return Response("Bunday admin yoq")
 
